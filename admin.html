@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Jundezain Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF9F5; --surface:#FFFFFF; --ink:#1A1D23; --ink-soft:#5B5E68;
+    --navy:#14213D; --navy-2:#1E2E52; --gold:#B8862B; --gold-soft:#F1E4C8;
+    --sage:#52795C; --sage-soft:#E5EFE3; --border:#E4E1D4; --danger:#A23B2E; --danger-soft:#F3E1DC;
+    --font-display:'Source Serif 4',Georgia,serif; --font-body:'Inter',sans-serif; --font-mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--font-body);background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;}
+  img{max-width:100%;display:block;}
+  input,select,textarea{font-family:var(--font-body);}
+
+  /* ---- Login ---- */
+  .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .login-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:40px 36px;max-width:360px;width:100%;text-align:center;}
+  .login-box .seal{width:52px;height:52px;border-radius:50%;border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-family:var(--font-display);font-weight:600;color:var(--gold);font-size:16px;}
+  .login-box h1{font-family:var(--font-display);font-size:19px;color:var(--navy);margin:0 0 6px;}
+  .login-box p{font-size:12.5px;color:var(--ink-soft);margin:0 0 24px;}
+  .login-box input{width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:5px;font-size:14px;margin-bottom:14px;}
+  .login-box button{width:100%;background:var(--navy);color:#fff;border:none;padding:12px;border-radius:5px;font-size:13.5px;font-weight:600;cursor:pointer;}
+  .login-box button:hover{background:var(--navy-2);}
+  .login-error{background:var(--danger-soft);color:var(--danger);font-size:12px;padding:8px 11px;border-radius:5px;margin-bottom:14px;display:none;}
+
+  /* ---- Shell ---- */
+  .topbar{background:var(--navy);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;}
+  .topbar-brand{display:flex;align-items:center;gap:10px;}
+  .topbar-brand .seal{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:600;color:var(--gold);font-size:11px;}
+  .topbar-brand-name{font-family:var(--font-display);font-size:15px;font-weight:600;}
+  .topbar-logout{background:transparent;border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 14px;border-radius:4px;font-size:12px;cursor:pointer;}
+  .topbar-logout:hover{background:rgba(255,255,255,.1);}
+
+  .tabs-row{background:var(--navy);display:flex;gap:2px;padding:0 24px;}
+  .tab-btn{background:transparent;border:none;color:#B9C0D6;padding:12px 20px;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;font-family:var(--font-body);}
+  .tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+  .tab-btn:hover:not(.active){color:#fff;}
+
+  .content{max-width:1180px;margin:0 auto;padding:28px 24px 60px;}
+  .page-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+  .page-head h2{font-family:var(--font-display);font-size:21px;color:var(--navy);margin:0;font-weight:600;}
+  .page-head p{font-size:12.5px;color:var(--ink-soft);margin:4px 0 0;}
+
+  .btn-primary{background:var(--navy);color:#fff;border:none;padding:10px 18px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);}
+  .btn-primary:hover{background:var(--navy-2);}
+  .btn-secondary{background:#fff;color:var(--navy);border:1px solid var(--border);padding:9px 16px;border-radius:5px;font-size:12.5px;cursor:pointer;font-family:var(--font-body);}
+  .btn-secondary:hover{border-color:var(--navy);}
+  .btn-sage{background:var(--sage);color:#fff;border:none;padding:7px 13px;border-radius:4px;font-size:11.5px;cursor:pointer;font-weight:600;}
+  .btn-sage:hover{opacity:.9;}
+  .btn-danger-text{background:transparent;border:none;color:var(--danger);cursor:pointer;font-size:12px;padding:4px 6px;}
+  .btn-edit-text{background:transparent;border:none;color:var(--navy);cursor:pointer;font-size:12px;padding:4px 6px;}
+
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:18px 20px;}
+  .stat-card .label{font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;}
+  .stat-card .value{font-family:var(--font-display);font-size:22px;font-weight:600;color:var(--navy);}
+  .stat-card.sage .value{color:var(--sage);}
+  .stat-card.danger .value{color:var(--danger);}
+  .stat-card.gold .value{color:var(--gold);}
+
+  table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:7px;overflow:hidden;}
+  th{background:var(--navy);color:var(--gold);text-align:left;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.03em;font-weight:600;}
+  td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  .empty-row td{text-align:center;color:var(--ink-soft);padding:30px;}
+
+  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+  .badge.lunas{background:var(--sage-soft);color:var(--sage);}
+  .badge.belum{background:var(--gold-soft);color:var(--gold);}
+  .badge.live{background:var(--sage-soft);color:var(--sage);}
+  .badge.soon{background:#EAE8E0;color:#8A8778;}
+
+  .search-box{padding:9px 13px;border:1px solid var(--border);border-radius:5px;font-size:13px;width:260px;}
+
+  /* ---- Modal ---- */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(20,33,61,.5);display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;z-index:200;}
+  .modal-box{background:#fff;border-radius:8px;padding:28px 30px;max-width:560px;width:100%;}
+  .modal-box h3{font-family:var(--font-display);font-size:18px;color:var(--navy);margin:0 0 20px;font-weight:600;}
+  .field-label{font-size:12px;color:var(--ink-soft);display:block;margin-bottom:5px;font-weight:500;}
+  .field-input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:5px;font-size:13.5px;margin-bottom:16px;}
+  textarea.field-input{resize:vertical;min-height:70px;}
+  .field-row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .modal-actions{display:flex;gap:10px;margin-top:6px;}
+  .img-preview{width:100%;height:120px;object-fit:cover;border-radius:6px;margin-bottom:10px;border:1px solid var(--border);background:var(--paper);}
+
+  .loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;z-index:300;font-size:13px;color:var(--navy);font-weight:600;}
+
+  @media (max-width:760px){
+    .stat-grid{grid-template-columns:1fr 1fr;}
+    .field-row2{grid-template-columns:1fr;}
+    table{display:block;overflow-x:auto;}
+    .search-box{width:100%;}
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+// ============================================================
+// KONFIGURASI
+// ============================================================
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxeXuzel23cu8LChbEf9duWBfpl4nx5QF9bscxk3C9HjeVHQW6eOU8NVPCySBT5AV1hhg/exec';
+
+const state = {
+  loggedIn: false,
+  adminPassword: '',
+  loginError: '',
+  loading: false,
+  activeTab: 'produk',
+  products: [],
+  customers: [],
+  salesRecap: null,
+  orders: [],
+  productModal: null, // null = tertutup, {} = tambah baru, {...produk} = edit
+  productSearch: '',
+  customerSearch: '',
+};
+
+function rupiah(n){ return 'Rp ' + Number(n||0).toLocaleString('id-ID'); }
+
+async function callApi(action, payload){
+  payload = payload || {};
+  if (state.adminPassword) payload.adminPassword = state.adminPassword;
+  const res = await fetch(WEBAPP_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action, ...payload }),
+  });
+  return JSON.parse(await res.text());
+}
+
+// ============================================================
+// LOGIN
+// ============================================================
+async function handleLogin(ev){
+  ev.preventDefault();
+  const pw = document.getElementById('login-password').value;
+  state.loading = true; render();
+  try {
+    const data = await callApi('adminLogin', { password: pw });
+    state.loading = false;
+    if (data.success){
+      state.loggedIn = true; state.adminPassword = pw; state.loginError = '';
+      await loadAllData();
+    } else {
+      state.loginError = data.message || 'Password salah.';
+    }
+  } catch (err) {
+    state.loading = false;
+    state.loginError = 'Gagal terhubung ke server: ' + err.message;
+  }
+  render();
+}
+function handleLogout(){
+  state.loggedIn = false; state.adminPassword = ''; state.products=[]; state.customers=[]; state.salesRecap=null; state.orders=[];
+  render();
+}
+
+// ============================================================
+// LOAD DATA
+// ============================================================
+async function loadAllData(){
+  state.loading = true; render();
+  try {
+    const [prodRes, custRes, salesRes, ordersRes] = await Promise.all([
+      callApi('getProducts'),
+      callApi('getCustomers'),
+      callApi('getSalesRecap'),
+      callApi('getOrdersList'),
+    ]);
+    if (prodRes.success) state.products = prodRes.products;
+    if (custRes.success) state.customers = custRes.customers;
+    if (salesRes.success) state.salesRecap = salesRes;
+    if (ordersRes.success) state.orders = ordersRes.orders;
+  } catch (err) {
+    alert('Gagal memuat data: ' + err.message);
+  }
+  state.loading = false; render();
+}
+
+function setTab(tab){ state.activeTab = tab; render(); }
+
+// ============================================================
+// PRODUK — CRUD
+// ============================================================
+function openProductModal(produk){
+  state.productModal = produk ? { ...produk, fitur: (produk.fitur||[]).join('\\n') } : { id:'', nama:'', kategori:'', ringkas:'', tagline:'', deskripsi:'', fitur:'', hargaLifetime:'', hargaLangganan:'', status:'Live', gambarURL:'', gambarBase64:'' };
+  render();
+}
+function closeProductModal(){ state.productModal = null; render(); }
+function handleProductImageChange(input){
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    state.productModal.gambarBase64 = e.target.result;
+    state.productModal.gambarMime = file.type;
+    state.productModal.gambarNamaFile = file.name;
+    render();
+  };
+  reader.readAsDataURL(file);
+}
+async function saveProduct(ev){
+  ev.preventDefault();
+  const m = state.productModal;
+  const product = {
+    id: m.id,
+    nama: document.getElementById('pf-nama').value.trim(),
+    kategori: document.getElementById('pf-kategori').value.trim(),
+    ringkas: document.getElementById('pf-ringkas').value.trim(),
+    tagline: document.getElementById('pf-tagline').value.trim(),
+    deskripsi: document.getElementById('pf-deskripsi').value.trim(),
+    fitur: document.getElementById('pf-fitur').value.split('\\n').map(s=>s.trim()).filter(Boolean),
+    hargaLifetime: Number(document.getElementById('pf-harga-lifetime').value) || 0,
+    hargaLangganan: Number(document.getElementById('pf-harga-langganan').value) || 0,
+    status: document.getElementById('pf-status').value,
+    gambarURL: m.gambarURL || '',
+    gambarBase64: m.gambarBase64 || '',
+    gambarMime: m.gambarMime || '',
+    gambarNamaFile: m.gambarNamaFile || '',
+  };
+  if (!product.nama){ alert('Nama produk wajib diisi.'); return; }
+
+  state.loading = true; render();
+  try {
+    const action = product.id ? 'updateProduct' : 'addProduct';
+    const data = await callApi(action, { product });
+    state.loading = false;
+    if (data.success){
+      state.productModal = null;
+      await loadAllData();
+    } else {
+      alert('Gagal menyimpan: ' + data.message);
+      render();
+    }
+  } catch (err) {
+    state.loading = false;
+    alert('Gagal terhubung ke server: ' + err.message);
+    render();
+  }
+}
+async function deleteProduct(id, nama){
+  if (!confirm('Hapus produk "' + nama + '"? Tindakan ini tidak bisa dibatalkan.')) return;
+  state.loading = true; render();
+  try {
+    const data = await callApi('deleteProduct', { id });
+    state.loading = false;
+    if (data.success) await loadAllData();
+    else { alert('Gagal menghapus: ' + data.message); render(); }
+  } catch (err) {
+    state.loading = false;
+    alert('Gagal terhubung ke server: ' + err.message);
+    render();
+  }
+}
+function updateProductSearch(v){ state.productSearch = v; render(); }
+function updateCustomerSearch(v){ state.customerSearch = v; render(); }
+
+// ============================================================
+// PENJUALAN — konfirmasi pesanan
+// ============================================================
+async function confirmOrder(orderNumber, namaPemesan){
+  if (!confirm('Konfirmasi pesanan "' + orderNumber + '" (' + namaPemesan + ') sebagai LUNAS?\\n\\nIni akan otomatis menerbitkan lisensi dan mengirim email ke pembeli.')) return;
+  state.loading = true; render();
+  try {
+    const data = await callApi('confirmOrder', { orderNumber });
+    state.loading = false;
+    alert(data.message);
+    if (data.success) await loadAllData();
+    else render();
+  } catch (err) {
+    state.loading = false;
+    alert('Gagal terhubung ke server: ' + err.message);
+    render();
+  }
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderLogin(){
+  return `<div class="login-wrap"><div class="login-box">
+    <div class="seal">JD</div>
+    <h1>Admin Jundezain Studio</h1>
+    <p>Masuk untuk kelola produk, pelanggan, dan penjualan</p>
+    <form onsubmit="handleLogin(event)">
+      <div class="login-error" style="${state.loginError?'display:block;':''}">${state.loginError}</div>
+      <input type="password" id="login-password" placeholder="Password admin" required>
+      <button type="submit" ${state.loading?'disabled':''}>${state.loading?'Memeriksa...':'Masuk'}</button>
+    </form>
+  </div></div>`;
+}
+
+function renderTopbar(){
+  return `<div class="topbar">
+    <div class="topbar-brand"><div class="seal">JD</div><div class="topbar-brand-name">Admin Jundezain Studio</div></div>
+    <button class="topbar-logout" onclick="handleLogout()">Keluar</button>
+  </div>
+  <div class="tabs-row">
+    <button class="tab-btn ${state.activeTab==='produk'?'active':''}" onclick="setTab('produk')">Produk</button>
+    <button class="tab-btn ${state.activeTab==='pelanggan'?'active':''}" onclick="setTab('pelanggan')">Pelanggan</button>
+    <button class="tab-btn ${state.activeTab==='penjualan'?'active':''}" onclick="setTab('penjualan')">Penjualan</button>
+  </div>`;
+}
+
+function renderProdukTab(){
+  const q = state.productSearch.toLowerCase();
+  const filtered = state.products.filter(p => !q || p.nama.toLowerCase().includes(q) || (p.kategori||'').toLowerCase().includes(q));
+  const rows = filtered.map(p => `
+    <tr>
+      <td>${p.nama}<div style="font-size:11px;color:var(--ink-soft);">${p.kategori||'-'}</div></td>
+      <td>${rupiah(p.hargaLifetime)} <span style="color:var(--ink-soft);">/ ${rupiah(p.hargaLangganan)} thn</span></td>
+      <td><span class="badge ${p.status==='Live'?'live':'soon'}">${p.status}</span></td>
+      <td style="white-space:nowrap;">
+        <button class="btn-edit-text" onclick='openProductModal(${JSON.stringify(p).replace(/'/g,"&apos;")})'>Ubah</button>
+        <button class="btn-danger-text" onclick="deleteProduct('${p.id}','${p.nama.replace(/'/g,"\\'")}')">Hapus</button>
+      </td>
+    </tr>`).join('');
+
+  return `
+    <div class="page-head">
+      <div><h2>Produk</h2><p>${state.products.length} produk terdaftar — tampil otomatis di landing page</p></div>
+      <button class="btn-primary" onclick="openProductModal(null)">+ Tambah Produk</button>
+    </div>
+    <input class="search-box" placeholder="Cari nama atau kategori..." value="${state.productSearch}" oninput="updateProductSearch(this.value)" style="margin-bottom:14px;">
+    <table>
+      <tr><th>Produk</th><th>Harga</th><th>Status</th><th>Aksi</th></tr>
+      ${rows || `<tr class="empty-row"><td colspan="4">Belum ada produk. Klik "+ Tambah Produk" untuk mulai.</td></tr>`}
+    </table>
+    ${state.productModal ? renderProductModal() : ''}`;
+}
+
+function renderProductModal(){
+  const m = state.productModal;
+  const isEdit = !!m.id;
+  return `<div class="modal-backdrop" onclick="if(event.target===this) closeProductModal()">
+    <div class="modal-box">
+      <h3>${isEdit ? 'Ubah Produk' : 'Tambah Produk Baru'}</h3>
+      <form onsubmit="saveProduct(event)">
+        ${(m.gambarBase64 || m.gambarURL) ? `<img class="img-preview" src="${m.gambarBase64 || m.gambarURL}">` : ''}
+        <label class="field-label">Gambar Produk</label>
+        <input type="file" accept="image/*" class="field-input" onchange="handleProductImageChange(this)">
+
+        <label class="field-label">Nama Produk</label>
+        <input class="field-input" id="pf-nama" value="${m.nama||''}" placeholder="Contoh: Aplikasi Konsultan Pajak" required>
+
+        <div class="field-row2">
+          <div><label class="field-label">Kategori</label><input class="field-input" id="pf-kategori" value="${m.kategori||''}" placeholder="Contoh: Perpajakan"></div>
+          <div><label class="field-label">Status</label>
+            <select class="field-input" id="pf-status">
+              <option value="Live" ${m.status==='Live'?'selected':''}>Live (tampil aktif)</option>
+              <option value="Segera Hadir" ${m.status==='Segera Hadir'?'selected':''}>Segera Hadir</option>
+            </select>
+          </div>
+        </div>
+
+        <label class="field-label">Ringkasan Singkat (untuk kartu katalog)</label>
+        <input class="field-input" id="pf-ringkas" value="${m.ringkas||''}" placeholder="1 kalimat singkat">
+
+        <label class="field-label">Tagline (untuk halaman detail)</label>
+        <input class="field-input" id="pf-tagline" value="${m.tagline||''}" placeholder="Kalimat menarik yang lebih panjang">
+
+        <label class="field-label">Deskripsi Lengkap</label>
+        <textarea class="field-input" id="pf-deskripsi" placeholder="Jelaskan produk ini secara lengkap">${m.deskripsi||''}</textarea>
+
+        <label class="field-label">Daftar Fitur (1 baris = 1 fitur)</label>
+        <textarea class="field-input" id="pf-fitur" placeholder="Fitur A&#10;Fitur B&#10;Fitur C">${m.fitur||''}</textarea>
+
+        <div class="field-row2">
+          <div><label class="field-label">Harga Seumur Hidup (Rp)</label><input class="field-input" type="number" id="pf-harga-lifetime" value="${m.hargaLifetime||''}" placeholder="2500000"></div>
+          <div><label class="field-label">Harga Berlangganan /tahun (Rp)</label><input class="field-input" type="number" id="pf-harga-langganan" value="${m.hargaLangganan||''}" placeholder="450000"></div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-primary" type="submit" style="flex:1;">${isEdit?'Simpan Perubahan':'Tambah Produk'}</button>
+          <button class="btn-secondary" type="button" onclick="closeProductModal()">Batal</button>
+        </div>
+      </form>
+    </div>
+  </div>`;
+}
+
+function renderPelangganTab(){
+  const q = state.customerSearch.toLowerCase();
+  const filtered = state.customers.filter(c => !q || c.nama.toLowerCase().includes(q) || c.email.toLowerCase().includes(q));
+  filtered.sort((a,b) => b.totalBelanja - a.totalBelanja);
+  const rows = filtered.map(c => `
+    <tr>
+      <td>${c.nama}<div style="font-size:11px;color:var(--ink-soft);">${c.email}</div></td>
+      <td>${c.whatsapp||'-'}</td>
+      <td>${c.totalPesanan}x</td>
+      <td>${rupiah(c.totalBelanja)}</td>
+      <td>
+        <span class="badge lunas">${c.pesananLunas} lunas</span>
+        ${c.pesananBelumLunas>0 ? ` <span class="badge belum">${c.pesananBelumLunas} belum</span>` : ''}
+      </td>
+    </tr>`).join('');
+
+  return `
+    <div class="page-head">
+      <div><h2>Pelanggan</h2><p>${state.customers.length} pelanggan unik — otomatis dari riwayat pesanan</p></div>
+    </div>
+    <input class="search-box" placeholder="Cari nama atau email..." value="${state.customerSearch}" oninput="updateCustomerSearch(this.value)" style="margin-bottom:14px;">
+    <table>
+      <tr><th>Pelanggan</th><th>WhatsApp</th><th>Total Pesanan</th><th>Total Belanja</th><th>Status</th></tr>
+      ${rows || `<tr class="empty-row"><td colspan="5">Belum ada pelanggan.</td></tr>`}
+    </table>`;
+}
+
+function renderPenjualanTab(){
+  const r = state.salesRecap || { totalPendapatan:0, totalBelumLunas:0, jumlahPesananLunas:0, jumlahPesananBelumLunas:0, totalPesananKeseluruhan:0 };
+  const rows = state.orders.map(o => `
+    <tr>
+      <td style="font-family:var(--font-mono);font-size:11.5px;">${o.orderNumber}</td>
+      <td>${o.namaPemesan}<div style="font-size:11px;color:var(--ink-soft);">${o.email}</div></td>
+      <td>${o.produk}<div style="font-size:11px;color:var(--ink-soft);">${o.paket}</div></td>
+      <td>${rupiah(o.hargaTotal)}</td>
+      <td>${o.tanggalPesan}</td>
+      <td><span class="badge ${o.status==='Lunas'?'lunas':'belum'}">${o.status}</span></td>
+      <td>${o.status!=='Lunas' ? `<button class="btn-sage" onclick="confirmOrder('${o.orderNumber}','${o.namaPemesan.replace(/'/g,"\\'")}')">Konfirmasi Lunas</button>` : (o.serialNumberTerbit ? `<span style="font-family:var(--font-mono);font-size:10.5px;color:var(--ink-soft);">${o.serialNumberTerbit}</span>` : '-')}</td>
+    </tr>`).join('');
+
+  return `
+    <div class="page-head">
+      <div><h2>Penjualan</h2><p>Rekap seluruh pesanan yang masuk</p></div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card sage"><div class="label">Total Pendapatan (Lunas)</div><div class="value">${rupiah(r.totalPendapatan)}</div></div>
+      <div class="stat-card gold"><div class="label">Belum Lunas</div><div class="value">${rupiah(r.totalBelumLunas)}</div></div>
+      <div class="stat-card"><div class="label">Pesanan Lunas</div><div class="value">${r.jumlahPesananLunas}</div></div>
+      <div class="stat-card"><div class="label">Pesanan Belum Lunas</div><div class="value">${r.jumlahPesananBelumLunas}</div></div>
+    </div>
+    <table>
+      <tr><th>No. Pesanan</th><th>Pemesan</th><th>Produk</th><th>Total</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr>
+      ${rows || `<tr class="empty-row"><td colspan="7">Belum ada pesanan.</td></tr>`}
+    </table>`;
+}
+
+function render(){
+  const app = document.getElementById('app');
+  if (!state.loggedIn){
+    app.innerHTML = renderLogin();
+    return;
+  }
+  let body = '';
+  if (state.activeTab === 'produk') body = renderProdukTab();
+  else if (state.activeTab === 'pelanggan') body = renderPelangganTab();
+  else if (state.activeTab === 'penjualan') body = renderPenjualanTab();
+
+  app.innerHTML = renderTopbar() + `<div class="content">${body}</div>` +
+    (state.loading ? `<div class="loading-overlay">Memuat...</div>` : '');
+}
+render();
+</script>
+</body>
+</html>
